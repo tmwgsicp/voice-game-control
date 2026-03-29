@@ -1,0 +1,82 @@
+/**
+ * Copyright (C) 2026 VoiceGameControl Contributors
+ * Licensed under MIT
+ */
+
+:root {
+  /* Primary */
+  --primary-color: #1890ff;
+  --success-color: #52c41a;
+  --warning-color: #fa8c16;
+  --error-color: #ff4d4f;
+
+  /* Text */
+  --text-primary: #262626;
+  --text-secondary: #595959;
+
+  /* Background */
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+
+  /* Border */
+  --border-light: #f0f0f0;
+  --border-base: #d9d9d9;
+
+  /* Shadow */
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-base: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* Font */
+  --font-xs: 12px;
+  --font-sm: 14px;
+  --font-base: 16px;
+  --font-lg: 20px;
+  --font-xl: 24px;
+
+  --font-regular: 400;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  --leading-normal: 1.6;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  /* Radius */
+  --radius-small: 4px;
+  --radius-base: 8px;
+  --radius-large: 12px;
+
+  /* Layout */
+  --width-wide: 1400px;
+
+  /* Animation */
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: var(--font-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  min-height: 100vh;
+}

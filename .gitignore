@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environment
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (敏感信息)
+.env
+*.local
+
+# Logs
+*.log
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# Frontend
+node_modules/
+dist/
+.vite/
+*.local
+
+# User data
+config.json
+game_actions.json
