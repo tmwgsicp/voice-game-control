@@ -1,14 +1,24 @@
 # VoiceGameControl
 
-> **极致低延迟的游戏语音控制工具**  
+> **🎯 公益项目 | 游戏无障碍语音控制工具**  
 > 🎮 用语音释放技能，解放双手  
-> ⚡ <200ms 响应延迟，专为竞技游戏优化
+> ⚡ <200ms 响应延迟，专为竞技游戏优化  
+> 💝 **完全免费开源，助力游戏无障碍体验**
 
 ---
 
-## 💡 项目起源
+## 🌟 公益初心
+
+**VoiceGameControl** 是一个完全开源的公益项目，旨在：
+- 💝 **帮助行动不便的玩家**：通过语音控制，降低游戏操作门槛
+- 🎮 **提升游戏体验**：为所有玩家提供更高效的语音交互方式
+- 🔓 **技术普惠**：MIT开源协议，任何人都可自由使用和改进
 
 本项目脱胎于 [VoiceType](https://github.com/tmwgsicp/voicetype) 开源语音输入项目，灵感来源于小红书上看到的 [zhanlong](https://github.com/robotLiberator/zhanlong) 公益项目（语音转键盘输入的无障碍工具）。
+
+---
+
+## 💡 为什么独立成项目
 
 VoiceType 的核心设计是**通用语音输入**（ASR + LLM 优化文本），但在游戏场景下发现：
 - LLM 处理增加 ~600ms 延迟（游戏不可接受）
@@ -149,7 +159,16 @@ npm run dev
 
 ## 🙏 致谢
 
-- [VoiceType](https://github.com/tmwgsicp/voicetype) - 技术框架来源
+- [VoiceType](https://github.com/tmwgsicp/voicetype) - 技术框架来源（同样是公益项目）
 - [zhanlong](https://github.com/robotLiberator/zhanlong) - 灵感启发（小红书公益项目）
 - [Tauri](https://tauri.app/) - 跨平台框架
 - [阿里云 DashScope](https://dashscope.aliyun.com/) - ASR 服务
+
+---
+
+## 💬 联系我们
+
+- **Issues**: [GitHub Issues](https://github.com/tmwgsicp/voice-game-control/issues)
+- **讨论**: [GitHub Discussions](https://github.com/tmwgsicp/voice-game-control/discussions)
+
+**我们期待你的反馈和贡献，一起让游戏更包容！** 🌈
