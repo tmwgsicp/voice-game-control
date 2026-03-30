@@ -40,28 +40,24 @@ class KeyboardOutput:
     
     async def press_key(self, key: str):
         """
-        直接按下单个按键
+        直接按下单个按键（游戏优化：同步执行）
         
         Args:
             key: 按键名称（如 'q', 'space', 'ctrl'）
         """
         _ensure_pynput()
-        loop = asyncio.get_event_loop()
         
-        def _press():
-            try:
-                key_obj = self._map_key(key)
-                _pynput_controller.press(key_obj)
-                _pynput_controller.release(key_obj)
-            except Exception as e:
-                logger.error(f"Failed to press key '{key}': {e}")
-        
-        await loop.run_in_executor(None, _press)
-        logger.debug(f"Pressed key: {key}")
+        try:
+            key_obj = self._map_key(key)
+            _pynput_controller.press(key_obj)
+            _pynput_controller.release(key_obj)
+            logger.debug(f"Pressed key: {key}")
+        except Exception as e:
+            logger.error(f"Failed to press key '{key}': {e}")
     
     async def press_keys_sequence(self, keys: List[str], delays: Optional[List[int]] = None):
         """
-        执行按键序列（支持连招）
+        执行按键序列（游戏优化：同步执行连招）
         
         Args:
             keys: 按键列表（如 ['q', 'w', 'e']）
@@ -70,25 +66,21 @@ class KeyboardOutput:
         import time
         
         _ensure_pynput()
-        loop = asyncio.get_event_loop()
         delays = delays or []
         
-        def _execute_sequence():
-            try:
-                for i, key in enumerate(keys):
-                    key_obj = self._map_key(key)
-                    _pynput_controller.press(key_obj)
-                    _pynput_controller.release(key_obj)
+        try:
+            for i, key in enumerate(keys):
+                key_obj = self._map_key(key)
+                _pynput_controller.press(key_obj)
+                _pynput_controller.release(key_obj)
+                
+                if i < len(keys) - 1:
+                    delay_ms = delays[i] if i < len(delays) else 50
+                    time.sleep(delay_ms / 1000.0)
                     
-                    if i < len(keys) - 1 and i < len(delays):
-                        time.sleep(delays[i] / 1000.0)
-                    elif i < len(keys) - 1:
-                        time.sleep(0.05)
-            except Exception as e:
-                logger.error(f"Failed to execute key sequence: {e}")
-        
-        await loop.run_in_executor(None, _execute_sequence)
-        logger.info(f"Executed key sequence: {keys}")
+            logger.info(f"Executed key sequence: {keys}")
+        except Exception as e:
+            logger.error(f"Failed to execute key sequence: {e}")
     
     def _map_key(self, key_name: str):
         """映射按键名称到pynput Key对象"""

@@ -56,3 +56,17 @@ dist/
 # User data
 config.json
 game_actions.json
+
+# Model weights (too large for git, download via script)
+# Note: speaker_recognition.onnx (25MB) is included for voiceprint feature
+models/bge-*
+*.safetensors
+*.bin
+*.pt
+
+# Model weights (download via script, too large for git)
+models/
+*.onnx
+*.safetensors
+*.bin
+*.pt

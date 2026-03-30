@@ -13,16 +13,28 @@ let _initialized = false
 
 export async function initApi() {
   if (_initialized) return
+  
+  const isWebMode = typeof window !== 'undefined' && !window.__TAURI__
+  
   try {
-    console.log('Initializing API, fetching port from Tauri...')
-    const port = await invoke<number>('get_port')
-    backendPort.value = port
-    baseUrl.value = `http://127.0.0.1:${port}`
-    _initialized = true
-    console.log(`API initialized: ${baseUrl.value}`)
+    if (isWebMode) {
+      const port = 18234
+      backendPort.value = port
+      baseUrl.value = `http://127.0.0.1:${port}`
+      _initialized = true
+      console.log(`API initialized (Web mode): ${baseUrl.value}`)
+    } else {
+      console.log('Initializing API, fetching port from Tauri...')
+      const port = await invoke<number>('get_port')
+      backendPort.value = port
+      baseUrl.value = `http://127.0.0.1:${port}`
+      _initialized = true
+      console.log(`API initialized (Tauri mode): ${baseUrl.value}`)
+    }
   } catch (error) {
     console.error('Failed to initialize API:', error)
-    baseUrl.value = ''
+    baseUrl.value = 'http://127.0.0.1:18234'
+    console.warn('Using fallback URL:', baseUrl.value)
   }
 }
 

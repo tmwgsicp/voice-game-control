@@ -20,6 +20,7 @@ setup(
         "pynput>=1.7.7",
         "sounddevice>=0.5.1",
         "numpy>=2.0.0",
+        "sherpa-onnx>=1.10.0",
     ],
     entry_points={
         "console_scripts": [

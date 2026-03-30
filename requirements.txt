@@ -5,3 +5,4 @@ pydantic==2.10.5
 pynput==1.7.7
 sounddevice==0.5.1
 numpy==2.2.1
+sherpa-onnx>=1.10.0

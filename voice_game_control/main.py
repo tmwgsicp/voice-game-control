@@ -21,6 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from voice_game_control.config import load_config
 from voice_game_control.engine import GameControlEngine
 from voice_game_control.api.game_routes import router as game_router, set_game_mapper
+from voice_game_control.api.voiceprint_routes import voiceprint_router, set_engine_instance
 
 logging.basicConfig(
     level=logging.INFO,
@@ -49,15 +50,19 @@ async def lifespan(app: FastAPI):
         asr_model=config.asr_model,
         asr_max_silence_ms=config.asr_max_silence_ms,
         hotkey=config.hotkey,
+        voiceprint_enabled=config.voiceprint_enabled,
+        voiceprint_speaker_id=config.voiceprint_speaker_id,
     )
     
     set_game_mapper(engine.game_mapper)
+    set_engine_instance(engine)
     
     await engine.start()
     
     logger.info("=" * 60)
     logger.info("VoiceGameControl service ready")
     logger.info("ASR: %s", config.asr_model)
+    logger.info("Voiceprint: %s", "enabled" if config.voiceprint_enabled else "disabled")
     logger.info("Hotkey: %s (toggle recording)", config.hotkey)
     logger.info("Web UI: http://%s:%d/", config.host, config.port)
     logger.info("=" * 60)
@@ -83,6 +88,7 @@ app.add_middleware(
 )
 
 app.include_router(game_router)
+app.include_router(voiceprint_router)
 
 
 @app.get("/api/health")

@@ -64,6 +64,11 @@ class GameControlConfig(BaseModel):
     
     # 自动启动
     auto_start_recording: bool = Field(default=False, description="Auto-start on launch")
+    
+    # 声纹过滤（可选）
+    voiceprint_enabled: bool = Field(default=False, description="Enable voiceprint filtering")
+    voiceprint_speaker_id: str = Field(default="player", description="Speaker ID for verification")
+    voiceprint_threshold: float = Field(default=0.5, description="Voiceprint threshold (0.5-1.0)")
 
 
 def load_config() -> GameControlConfig:
@@ -99,6 +104,9 @@ def load_config() -> GameControlConfig:
         "ASR_MODEL": "asr_model",
         "HOTKEY": "hotkey",
         "PORT": "port",
+        "VOICEPRINT_ENABLED": "voiceprint_enabled",
+        "VOICEPRINT_SPEAKER_ID": "voiceprint_speaker_id",
+        "VOICEPRINT_THRESHOLD": "voiceprint_threshold",
     }
     
     overrides = {}
@@ -110,6 +118,8 @@ def load_config() -> GameControlConfig:
             
             if field_type == int:
                 overrides[config_key] = int(val)
+            elif field_type == float:
+                overrides[config_key] = float(val)
             elif field_type == bool:
                 overrides[config_key] = val.lower() in ("true", "1", "yes")
             else:

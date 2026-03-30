@@ -25,6 +25,9 @@ from voice_game_control.platform.microphone import Microphone
 from voice_game_control.platform.keyboard_output import KeyboardOutput
 from voice_game_control.platform.game_action_mapper import GameActionMapper
 from voice_game_control.platform.hotkey_listener import HotkeyListener
+from voice_game_control.platform.voiceprint.factory import VoiceprintServiceFactory
+from voice_game_control.platform.voiceprint.base import VoiceprintProvider
+from voice_game_control.pipeline.voiceprint_filter import VoiceprintFilter
 from voice_game_control.voiceforge.core.config import ASRConfig
 from voice_game_control.voiceforge.extensions.providers.aliyun.asr_qwen import QwenASRExtension
 
@@ -50,6 +53,8 @@ class GameControlEngine:
         asr_model: str,
         asr_max_silence_ms: int,
         hotkey: str,
+        voiceprint_enabled: bool = False,
+        voiceprint_speaker_id: str = "player",
     ):
         self._asr_api_key = asr_api_key
         self._asr_model = asr_model
@@ -57,6 +62,29 @@ class GameControlEngine:
 
         self.game_mapper = GameActionMapper()
         self.keyboard_output = KeyboardOutput()
+        
+        # 声纹过滤器（游戏优化）
+        voiceprint_service = None
+        if voiceprint_enabled:
+            try:
+                from voice_game_control.config import get_config_dir
+                voiceprint_service = VoiceprintServiceFactory.create_service(
+                    VoiceprintProvider.LOCAL_ONNX,
+                    {
+                        "model_path": "models/speaker_recognition.onnx",
+                        "storage_dir": str(get_config_dir() / "voiceprints"),
+                        "sample_rate": 16000,
+                        "threshold": 0.6
+                    }
+                )
+            except Exception as e:
+                logger.warning(f"Voiceprint service init failed: {e}")
+        
+        self.voiceprint_filter = VoiceprintFilter(
+            service=voiceprint_service,
+            speaker_id=voiceprint_speaker_id,
+            enabled=voiceprint_enabled
+        )
         
         self.microphone = Microphone()
         self.microphone.on_audio(self._on_audio_chunk)
@@ -69,11 +97,13 @@ class GameControlEngine:
         self._recording = False
         self._asr_ext: Optional[QwenASRExtension] = None
         self._ws_clients: List[WebSocket] = []
+        self._loop: Optional[asyncio.AbstractEventLoop] = None
         
-        logger.info("GameControlEngine initialized")
+        logger.info("GameControlEngine initialized (voiceprint=%s)", voiceprint_enabled)
 
     async def start(self):
         """启动引擎"""
+        self._loop = asyncio.get_running_loop()
         await self.keyboard_output.start()
         self.hotkey_listener.start()
         logger.info("GameControlEngine started")
@@ -87,6 +117,10 @@ class GameControlEngine:
         self.hotkey_listener.stop()
         await self.keyboard_output.stop()
         logger.info("GameControlEngine stopped")
+    
+    def set_voiceprint_enabled(self, enabled: bool):
+        """动态启用/禁用声纹过滤"""
+        self.voiceprint_filter.set_enabled(enabled)
 
     def start_recording(self):
         """启动录音"""
@@ -95,8 +129,10 @@ class GameControlEngine:
             return
 
         logger.info("Voice input activating...")
-        task = asyncio.create_task(self._start_recording_async(), name="start-recording")
-        task.add_done_callback(_task_done_callback)
+        if self._loop and self._loop.is_running():
+            asyncio.run_coroutine_threadsafe(self._start_recording_async(), self._loop)
+        else:
+            logger.error("Event loop not available")
 
     async def _start_recording_async(self):
         """异步启动录音"""
@@ -148,11 +184,18 @@ class GameControlEngine:
         await self._broadcast({"type": "recording_stopped"})
 
     async def _on_audio_chunk(self, pcm_data: bytes):
-        """麦克风音频回调"""
+        """麦克风音频回调（添加声纹过滤）"""
         if not self._recording or not self._asr_ext:
             return
 
         try:
+            # 声纹过滤：拒绝非本人声音
+            if self.voiceprint_filter.enabled:
+                is_verified = await self.voiceprint_filter.verify_audio_chunk(pcm_data)
+                if not is_verified:
+                    logger.debug("Audio rejected by voiceprint filter")
+                    return
+            
             await self._asr_ext.on_data("audio_frame", pcm_data)
         except Exception as e:
             logger.error("Failed to send audio to ASR: %s", e)
